@@ -294,8 +294,8 @@ if [ -n "$CLAWDBOT_GATEWAY_TOKEN" ]; then
     echo "Starting gateway with token auth..."
     exec clawdbot gateway --port 18789 --verbose --allow-unconfigured --bind "$BIND_MODE" --token "$CLAWDBOT_GATEWAY_TOKEN"
 else
-    BIND_MODE="local"
+    BIND_MODE="loopback"
     echo "Dev mode: ${CLAWDBOT_DEV_MODE:-false}, Bind mode: $BIND_MODE (no token)"
-    echo "Starting gateway with local bind (proxied by Worker)..."
+    echo "Starting gateway with loopback bind (proxied by Worker)..."
     exec clawdbot gateway --port 18789 --verbose --allow-unconfigured --bind "$BIND_MODE"
 fi
