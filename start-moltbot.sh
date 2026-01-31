@@ -287,13 +287,15 @@ echo "Gateway will be available on port 18789"
 rm -f /tmp/clawdbot-gateway.lock 2>/dev/null || true
 rm -f "$CONFIG_DIR/gateway.lock" 2>/dev/null || true
 
-BIND_MODE="lan"
-echo "Dev mode: ${CLAWDBOT_DEV_MODE:-false}, Bind mode: $BIND_MODE"
-
+# Use "lan" bind mode with token, "local" without (gateway refuses lan without auth)
 if [ -n "$CLAWDBOT_GATEWAY_TOKEN" ]; then
+    BIND_MODE="lan"
+    echo "Dev mode: ${CLAWDBOT_DEV_MODE:-false}, Bind mode: $BIND_MODE (with token)"
     echo "Starting gateway with token auth..."
     exec clawdbot gateway --port 18789 --verbose --allow-unconfigured --bind "$BIND_MODE" --token "$CLAWDBOT_GATEWAY_TOKEN"
 else
-    echo "Starting gateway with device pairing (no token)..."
+    BIND_MODE="local"
+    echo "Dev mode: ${CLAWDBOT_DEV_MODE:-false}, Bind mode: $BIND_MODE (no token)"
+    echo "Starting gateway with local bind (proxied by Worker)..."
     exec clawdbot gateway --port 18789 --verbose --allow-unconfigured --bind "$BIND_MODE"
 fi
