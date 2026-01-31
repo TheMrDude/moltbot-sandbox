@@ -170,10 +170,15 @@ config.gateway.port = 18789;
 config.gateway.mode = 'local';
 config.gateway.trustedProxies = ['10.1.0.0'];
 
-// Set gateway token if provided
+// Set or clear gateway token based on env var
 if (process.env.CLAWDBOT_GATEWAY_TOKEN) {
     config.gateway.auth = config.gateway.auth || {};
     config.gateway.auth.token = process.env.CLAWDBOT_GATEWAY_TOKEN;
+} else {
+    // Clear token if env var is not set (allows switching from token to device pairing mode)
+    if (config.gateway && config.gateway.auth) {
+        delete config.gateway.auth.token;
+    }
 }
 
 // Allow insecure auth for dev mode
