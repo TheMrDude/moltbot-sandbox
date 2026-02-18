@@ -14,12 +14,15 @@ export async function findExistingMoltbotProcess(sandbox: Sandbox): Promise<Proc
   try {
     const processes = await sandbox.listProcesses();
     for (const proc of processes) {
-      // Only match the gateway process, not CLI commands like "clawdbot devices list"
-      // Note: CLI is still named "clawdbot" until upstream renames it
-      const isGatewayProcess = 
+      // Only match the gateway process, not CLI commands like "openclaw devices list"
+      const isGatewayProcess =
+        proc.command.includes('start-openclaw.sh') ||
+        proc.command.includes('openclaw gateway') ||
         proc.command.includes('start-moltbot.sh') ||
         proc.command.includes('clawdbot gateway');
-      const isCliCommand = 
+      const isCliCommand =
+        proc.command.includes('openclaw devices') ||
+        proc.command.includes('openclaw --version') ||
         proc.command.includes('clawdbot devices') ||
         proc.command.includes('clawdbot --version');
       
@@ -79,7 +82,7 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
   // Start a new Moltbot gateway
   console.log('Starting new Moltbot gateway...');
   const envVars = buildEnvVars(env);
-  const command = '/usr/local/bin/start-moltbot.sh';
+  const command = '/usr/local/bin/start-openclaw.sh';
 
   console.log('Starting process with command:', command);
   console.log('Environment vars being passed:', Object.keys(envVars));

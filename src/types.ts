@@ -14,9 +14,13 @@ export interface MoltbotEnv {
   ANTHROPIC_API_KEY?: string;
   ANTHROPIC_BASE_URL?: string;
   OPENAI_API_KEY?: string;
-  MOLTBOT_GATEWAY_TOKEN?: string; // Gateway token (mapped to CLAWDBOT_GATEWAY_TOKEN for container)
+  MOLTBOT_GATEWAY_TOKEN?: string; // Gateway token (mapped to OPENCLAW_GATEWAY_TOKEN for container)
 
-  CLAWDBOT_BIND_MODE?: string;
+  // Cloudflare AI Gateway (preferred over direct provider keys)
+  CLOUDFLARE_AI_GATEWAY_API_KEY?: string;
+  CF_AI_GATEWAY_ACCOUNT_ID?: string;
+  CF_AI_GATEWAY_GATEWAY_ID?: string;
+  CF_AI_GATEWAY_MODEL?: string; // e.g., "anthropic/claude-sonnet-4-5"
   DEV_MODE?: string; // Set to 'true' for local dev (skips CF Access auth + moltbot device pairing)
   DEBUG_ROUTES?: string; // Set to 'true' to enable /debug/* routes
   SANDBOX_SLEEP_AFTER?: string; // How long before sandbox sleeps: 'never' (default), or duration like '10m', '1h'

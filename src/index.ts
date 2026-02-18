@@ -55,27 +55,37 @@ export { Sandbox };
 function validateRequiredEnv(env: MoltbotEnv): string[] {
   const missing: string[] = [];
 
+  const isTestMode = env.DEV_MODE === 'true';
+
   if (!env.MOLTBOT_GATEWAY_TOKEN) {
     missing.push('MOLTBOT_GATEWAY_TOKEN');
   }
 
-  if (!env.CF_ACCESS_TEAM_DOMAIN) {
-    missing.push('CF_ACCESS_TEAM_DOMAIN');
-  }
-
-  if (!env.CF_ACCESS_AUD) {
-    missing.push('CF_ACCESS_AUD');
-  }
-
-  // Check for AI Gateway or direct Anthropic configuration
-  if (env.AI_GATEWAY_API_KEY) {
-    // AI Gateway requires both API key and base URL
-    if (!env.AI_GATEWAY_BASE_URL) {
-      missing.push('AI_GATEWAY_BASE_URL (required when using AI_GATEWAY_API_KEY)');
+  // CF Access vars not required in dev/test mode since auth is skipped
+  if (!isTestMode) {
+    if (!env.CF_ACCESS_TEAM_DOMAIN) {
+      missing.push('CF_ACCESS_TEAM_DOMAIN');
     }
-  } else if (!env.ANTHROPIC_API_KEY) {
-    // Direct Anthropic access requires API key
-    missing.push('ANTHROPIC_API_KEY or AI_GATEWAY_API_KEY');
+
+    if (!env.CF_ACCESS_AUD) {
+      missing.push('CF_ACCESS_AUD');
+    }
+  }
+
+  // Check for AI provider configuration (at least one must be set)
+  const hasCloudflareGateway = !!(
+    env.CLOUDFLARE_AI_GATEWAY_API_KEY &&
+    env.CF_AI_GATEWAY_ACCOUNT_ID &&
+    env.CF_AI_GATEWAY_GATEWAY_ID
+  );
+  const hasLegacyGateway = !!(env.AI_GATEWAY_API_KEY && env.AI_GATEWAY_BASE_URL);
+  const hasAnthropicKey = !!env.ANTHROPIC_API_KEY;
+  const hasOpenAIKey = !!env.OPENAI_API_KEY;
+
+  if (!hasCloudflareGateway && !hasLegacyGateway && !hasAnthropicKey && !hasOpenAIKey) {
+    missing.push(
+      'ANTHROPIC_API_KEY, OPENAI_API_KEY, or CLOUDFLARE_AI_GATEWAY_API_KEY + CF_AI_GATEWAY_ACCOUNT_ID + CF_AI_GATEWAY_GATEWAY_ID',
+    );
   }
 
   return missing;
