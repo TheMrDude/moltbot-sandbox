@@ -1,4 +1,4 @@
-# OpenClaw on Cloudflare Workers
+# OpenClaw on Cloudflare Workers.
 
 Run [OpenClaw](https://github.com/openclaw/openclaw) (formerly Moltbot, formerly Clawdbot) personal AI assistant in a [Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/).
 
