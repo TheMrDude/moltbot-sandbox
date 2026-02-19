@@ -207,12 +207,16 @@ if (process.env.CF_AI_GATEWAY_MODEL) {
 // Telegram configuration
 if (process.env.TELEGRAM_BOT_TOKEN) {
   // Valid dmPolicy values: "pairing", "allowlist", "open", "disabled"
-  // Map legacy "owner" to "allowlist" (most restrictive option that works)
-  let dmPolicy = process.env.TELEGRAM_DM_POLICY || 'pairing';
+  let dmPolicy = process.env.TELEGRAM_DM_POLICY || 'open';
   const validPolicies = ['pairing', 'allowlist', 'open', 'disabled'];
   if (!validPolicies.includes(dmPolicy)) {
-    console.log('Invalid TELEGRAM_DM_POLICY "' + dmPolicy + '", mapping to "allowlist"');
-    dmPolicy = 'allowlist';
+    console.log('Invalid TELEGRAM_DM_POLICY "' + dmPolicy + '", defaulting to "open"');
+    dmPolicy = 'open';
+  }
+  // If allowlist mode but no allowFrom list, fall back to open
+  if (dmPolicy === 'allowlist' && !process.env.TELEGRAM_DM_ALLOW_FROM) {
+    console.log('TELEGRAM_DM_POLICY is "allowlist" but no TELEGRAM_DM_ALLOW_FROM set, falling back to "open"');
+    dmPolicy = 'open';
   }
   config.channels.telegram = {
     botToken: process.env.TELEGRAM_BOT_TOKEN,
