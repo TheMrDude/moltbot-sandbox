@@ -30,7 +30,7 @@ The income-bots API is accessible via HTTP. Use the `fetch` tool or equivalent t
 | habitquest-content | HabitQuest Blog | Habit formation content for habitquest.dev |
 | substack-publisher | Substack Publisher | Publishes to Substack |
 | pinterest-publisher | Pinterest Publisher | Creates Pinterest pins |
-| tiktok-publisher | TikTok Publisher | Generates TikTok photo carousel slideshows |
+| tiktok-publisher | TikTok Publisher | Generates TikTok photo carousel slideshows with Cloudflare AI images |
 
 ## API Endpoints
 
@@ -63,6 +63,9 @@ Trigger a pipeline cycle manually.
 
 ### GET /alerts?botId=...&severity=...
 System alerts. Optional filters.
+
+### GET /images/:filename
+Serves generated slideshow images (PNG). Images are created by the TikTok publisher's `generate_images` tool using Cloudflare Workers AI. Returns binary PNG with `Cache-Control: public, max-age=86400`.
 
 ### GET /health
 Health check. Returns `{"ok": true}`.
@@ -105,6 +108,18 @@ When generating content or making decisions on behalf of a bot, fetch its person
 - **GET /personas/:botId** — returns the full persona document
 - Use the persona's guidelines for tone, structure, and quality standards
 - When reporting bot activity, use the persona's communication style
+
+## TikTok Slideshow Workflow
+
+The TikTok publisher generates photo carousels using Cloudflare Workers AI for image generation (free tier). Flow:
+
+1. **generate_slideshow** — Creates 6-slide spec with image prompts from harvested content
+2. **generate_images** — Generates actual PNG images via Cloudflare Workers AI (Flux Schnell or SDXL)
+3. **publish_slideshow** — Posts to TikTok via Postiz API using the generated image URLs
+
+Images are served at `{API_URL}/images/{contentId}-slide-{n}.png`. The tunnel URL must be accessible for Postiz to download images during posting.
+
+Models available: `flux-schnell` (default, fast+quality), `sdxl`, `sdxl-lightning` (fastest).
 
 ## Suggested Daily Workflow
 
