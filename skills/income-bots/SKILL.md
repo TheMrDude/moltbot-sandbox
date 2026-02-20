@@ -67,6 +67,14 @@ System alerts. Optional filters.
 ### GET /images/:filename
 Serves generated slideshow images (PNG). Images are created by the TikTok publisher's `generate_images` tool using Cloudflare Workers AI. Returns binary PNG with `Cache-Control: public, max-age=86400`.
 
+### GET /schedule
+View all scheduled jobs with cron expressions, enabled state, last run time, and descriptions.
+
+### POST /schedule/update
+Update a schedule's cron expression or enabled state.
+Body: `{"jobId": "harvest", "cronExpression": "0 9,14,20 * * *", "enabled": true}`
+Valid job IDs: `harvest`, `pipeline`, `notify`, `daily_report`, `weekly_newsletter`.
+
 ### GET /health
 Health check. Returns `{"ok": true}`.
 
@@ -121,10 +129,24 @@ Images are served at `{API_URL}/images/{contentId}-slide-{n}.png`. The tunnel UR
 
 Models available: `flux-schnell` (default, fast+quality), `sdxl`, `sdxl-lightning` (fastest).
 
+## Automated Schedule
+
+The system runs on a multi-stage scheduler. All times are local.
+
+| Job | Default Schedule | What It Does |
+|-----|-----------------|--------------|
+| `harvest` | 8am, 1pm, 7pm | Scrapes Reddit & HackerNews for trending content |
+| `pipeline` | 8:30am, 1:30pm, 7:30pm | Scores, filters, fans out tasks to bots |
+| `notify` | 8:35am, 1:35pm, 7:35pm | Sends Telegram notification if approvals are pending |
+| `daily_report` | 9pm | Daily summary: tasks, content, revenue, alerts |
+| `weekly_newsletter` | Sunday 6pm | Newsletter curation batch |
+
+All content requires manual approval before publishing. Use `GET /schedule` to see current timings, `POST /schedule/update` to change them.
+
 ## Suggested Daily Workflow
 
 1. Check the dashboard for overview
-2. Review and approve pending tasks
+2. Review and approve pending tasks (you'll get notified 3x/day)
 3. Check for any critical alerts
 4. Review revenue trends
-5. Run the pipeline if content is backed up
+5. Run the pipeline manually if content is backed up
