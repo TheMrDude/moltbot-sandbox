@@ -66,6 +66,12 @@ System alerts. Optional filters.
 ### GET /health
 Health check. Returns `{"ok": true}`.
 
+### GET /personas
+List all bot personas with identity summaries.
+
+### GET /personas/:botId
+Get the full detailed persona/soul file for a specific bot. Use this when you need to understand a bot's expertise, decision-making framework, or communication style in depth.
+
 ## How to Use
 
 When the user asks about their income bots, make HTTP requests to the API:
@@ -89,6 +95,15 @@ When presenting data, format it cleanly:
 - Summarize bot statuses as active/idle/error
 - For approvals, show task type, bot name, and a brief description
 - Keep messages concise — Telegram messages should be scannable
+
+## Bot Personas
+
+Each bot has a detailed expert persona that defines its identity, decision-making framework, quality standards, and communication style. These are based on research showing that detailed expert identities dramatically outperform generic role labels for AI-driven content quality.
+
+When generating content or making decisions on behalf of a bot, fetch its persona first:
+- **GET /personas/:botId** — returns the full persona document
+- Use the persona's guidelines for tone, structure, and quality standards
+- When reporting bot activity, use the persona's communication style
 
 ## Suggested Daily Workflow
 
