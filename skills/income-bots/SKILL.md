@@ -1,110 +1,94 @@
 ---
 name: income-bots
-description: Manage and monitor the income-generating bots system. Check bot status, revenue reports, approve pending tasks, view content pipeline, and trigger workflows. Connect to the orchestrator MCP server for full control of all 7 income bots.
+description: Manage and monitor the income-generating bots system via HTTP API. Check bot status, revenue reports, approve pending tasks, view content pipeline, and trigger workflows.
 ---
 
 # Income Bots Manager
 
-Manage the AI-powered income generation system with 7 specialized bots and an orchestrator.
+Manage the AI-powered income generation system with 12 specialized bots and an orchestrator.
 
-## System Overview
+## API Connection
 
-The income-bots system consists of:
+The income-bots API is accessible via HTTP. Use the `fetch` tool or equivalent to make requests.
 
-| Bot | Purpose |
-|-----|---------|
-| Content Harvester | Finds trending topics and curates content |
-| Social Publisher | Posts to Twitter/X, LinkedIn, Pinterest |
-| Gumroad Store | Creates and sells digital products |
-| Newsletter | Manages Substack/email newsletters |
-| SEO Content | Generates search-optimized articles |
-| Course Generator | Creates online courses |
-| Affiliate Finder | Discovers and manages affiliate partnerships |
+**Base URL**: Set via the `INCOME_BOTS_API_URL` environment variable.
+**Auth**: Include `Authorization: Bearer {INCOME_BOTS_API_TOKEN}` header if a token is configured.
 
-## Common Tasks
+## Bots in the System
 
-### Check System Status
-To get a full overview of all bots, revenue, and pending tasks:
-```
-Show me the income bots dashboard
-```
+| Bot ID | Name | Purpose |
+|--------|------|---------|
+| orchestrator | Orchestrator | Master coordinator |
+| content-harvester | Content Harvester | Finds trending topics from Reddit, HackerNews |
+| social-publisher | Social Publisher | Posts to Twitter/X, LinkedIn |
+| gumroad-store | Gumroad Store | Creates and sells digital products |
+| newsletter | Newsletter | Manages email newsletters |
+| seo-content | SEO Content | Generates search-optimized articles for Medium, Dev.to |
+| course-generator | Course Generator | Creates online courses and eBooks |
+| affiliate-finder | Affiliate Finder | Discovers affiliate partnerships |
+| crypto-harvester | Crypto Harvester | Crypto-specific content harvesting |
+| habitquest-content | HabitQuest Blog | Habit formation content for habitquest.dev |
+| substack-publisher | Substack Publisher | Publishes to Substack |
+| pinterest-publisher | Pinterest Publisher | Creates Pinterest pins |
 
-### Revenue Reporting
-```
-What's my revenue for the last 30 days?
-Which bot is generating the most revenue?
-```
+## API Endpoints
 
-### Task Approval
-Tasks that require human review (content publishing, purchases, etc.) go into an approval queue:
-```
-Show me pending approvals
-Approve task [taskId]
-Reject task [taskId] with feedback "needs more detail"
-```
+### GET /dashboard
+Full system overview: bot count, revenue, pending tasks, alerts.
 
-### Content Pipeline
-Content flows through stages: draft → awaiting_approval → approved → scheduled → published
-```
-Show the content pipeline
-What content is ready to publish?
-```
+### GET /revenue?days=30
+Revenue report. Optional `days` query param (default 30).
 
-### Manual Task Creation
-```
-Create a task for the social publisher to post about [topic]
-Tell the content harvester to find trending topics in [niche]
-```
+### GET /bots
+Status of all bots with task counts and revenue.
 
-### Pipeline Operations
-```
-Run the content pipeline now
-Show pipeline status
-```
+### GET /bots/:botId
+Detailed status of a specific bot.
 
-## MCP Server Connection
+### GET /approvals
+All tasks awaiting approval with details.
 
-The orchestrator runs as an MCP server at:
-- **Location**: `/Users/danielkent/income-bots/`
-- **Entry**: `dist/orchestrator/index.js`
-- **Transport**: stdio
+### POST /approve
+Approve or reject a task. Body: `{"taskId": "...", "approved": true/false, "feedback": "optional"}`
 
-### Available MCP Tools
+### GET /pipeline
+Content pipeline overview (draft, awaiting_approval, approved, scheduled, published counts).
 
-| Tool | Description |
-|------|-------------|
-| `get_dashboard` | Full system overview |
-| `get_bot_status` | Status of specific or all bots |
-| `get_revenue_report` | Revenue data for any time period |
-| `get_approval_queue` | Tasks waiting for approval |
-| `approve_task` | Approve or reject a task |
-| `create_bot_task` | Create a new task for any bot |
-| `get_alerts` | System alerts and warnings |
-| `resolve_alert` | Mark alerts as resolved |
-| `get_content_pipeline` | Content in all pipeline stages |
-| `get_pipeline_status` | Pipeline runner status |
-| `run_pipeline_now` | Trigger a pipeline cycle |
-| `generate_report` | Daily/weekly/monthly reports |
+### GET /pipeline/status
+Pipeline runner status (last run, active state).
 
-## Bot Types for Task Creation
+### POST /pipeline/run
+Trigger a pipeline cycle manually.
 
-When creating tasks, use these bot IDs:
-- `content-harvester`
-- `social-publisher`
-- `gumroad-store`
-- `newsletter`
-- `seo-content`
-- `course-generator`
-- `affiliate-finder`
-- `substack-publisher`
-- `pinterest-publisher`
+### GET /alerts?botId=...&severity=...
+System alerts. Optional filters.
 
-## Interpreting Data
+### GET /health
+Health check. Returns `{"ok": true}`.
 
-- Revenue is tracked per-bot and per-source
-- Tasks have statuses: pending, awaiting_approval, approved, in_progress, completed, failed, cancelled
-- Alerts have severity levels: info, warning, error, critical
-- Content pipeline shows counts at each stage
+## How to Use
+
+When the user asks about their income bots, make HTTP requests to the API:
+
+1. **"Show dashboard"** → GET /dashboard
+2. **"Revenue report"** → GET /revenue
+3. **"Bot status"** → GET /bots
+4. **"Pending approvals"** → GET /approvals
+5. **"Approve task X"** → POST /approve with `{"taskId": "X", "approved": true}`
+6. **"Reject task X"** → POST /approve with `{"taskId": "X", "approved": false}`
+7. **"Run pipeline"** → POST /pipeline/run
+8. **"Any alerts?"** → GET /alerts
+
+Format responses in a clean, readable way for Telegram. Use short summaries, not raw JSON dumps.
+
+## Response Formatting for Telegram
+
+When presenting data, format it cleanly:
+- Use bullet points for lists
+- Show revenue as dollar amounts
+- Summarize bot statuses as active/idle/error
+- For approvals, show task type, bot name, and a brief description
+- Keep messages concise — Telegram messages should be scannable
 
 ## Suggested Daily Workflow
 

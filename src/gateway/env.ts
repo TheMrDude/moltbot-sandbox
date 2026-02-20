@@ -65,6 +65,11 @@ export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
   if (env.SLACK_APP_TOKEN) envVars.SLACK_APP_TOKEN = env.SLACK_APP_TOKEN;
   if (env.CDP_SECRET) envVars.CDP_SECRET = env.CDP_SECRET;
   if (env.WORKER_URL) envVars.WORKER_URL = env.WORKER_URL;
+  if (env.TELEGRAM_DM_ALLOW_FROM) envVars.TELEGRAM_DM_ALLOW_FROM = env.TELEGRAM_DM_ALLOW_FROM;
+
+  // Income Bots API connection
+  if (env.INCOME_BOTS_API_URL) envVars.INCOME_BOTS_API_URL = env.INCOME_BOTS_API_URL;
+  if (env.INCOME_BOTS_API_TOKEN) envVars.INCOME_BOTS_API_TOKEN = env.INCOME_BOTS_API_TOKEN;
 
   return envVars;
 }
