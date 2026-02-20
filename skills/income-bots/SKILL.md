@@ -30,6 +30,7 @@ The income-bots API is accessible via HTTP. Use the `fetch` tool or equivalent t
 | habitquest-content | HabitQuest Blog | Habit formation content for habitquest.dev |
 | substack-publisher | Substack Publisher | Publishes to Substack |
 | pinterest-publisher | Pinterest Publisher | Creates Pinterest pins |
+| tiktok-publisher | TikTok Publisher | Generates TikTok photo carousel slideshows |
 
 ## API Endpoints
 
